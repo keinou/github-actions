@@ -1,6 +1,6 @@
 name: Build and push node application
 
-on: 
+on:
   workflow_call:
 
 env:
@@ -21,11 +21,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set NPM Variables
-        run: echo "$PACKAGES_NPMRC" > .npmrc
+
+      - name: Authenticate with private NPM package
         env:
-          PACKAGES_NPMRC: ${{ secrets.PACKAGES_NPMRC }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "@devburst-io:registry=https://npm.pkg.github.com/" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=$NODE_AUTH_TOKEN" >> ~/.npmrc
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -40,7 +42,7 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-  
+
       - name: Log in to the Container registry
         uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
