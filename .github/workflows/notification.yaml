@@ -18,18 +18,18 @@ jobs:
         with:
           severity: info
           details: Build Succeeded!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhookUrl: ${{ secrets.webhookUrl }}
       - name: Build Failure
         uses: rjstone/discord-webhook-notify@v1
         if: failure()
         with:
           severity: error
           details: Build Failed!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhookUrl: ${{ secrets.webhookUrl }}
       - name: Build Cancelled
         uses: rjstone/discord-webhook-notify@v1
         if: cancelled()
         with:
           severity: warn
           details: Build Cancelled!
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhookUrl: ${{ secrets.webhookUrl }}
