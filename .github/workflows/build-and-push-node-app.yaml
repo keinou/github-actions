@@ -65,5 +65,5 @@ jobs:
   notification:
     needs: ["build"]
     uses: keinou/github-actions/.github/workflows/notification.yaml@main
-    with:
+    secrets:
       webhookUrl: ${{ secrets.discordWebhookUrl }}
