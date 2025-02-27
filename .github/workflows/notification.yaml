@@ -2,6 +2,9 @@ name: Build and push node application
 
 on:
   workflow_call:
+    secrets:
+      webhookUrl:
+        required: true
 
 jobs:
   build:

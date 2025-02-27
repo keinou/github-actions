@@ -2,6 +2,9 @@ name: Build and push node application
 
 on:
   workflow_call:
+    secrets:
+      discordWebhookUrl:
+        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -62,3 +65,5 @@ jobs:
   notification:
     needs: ["build"]
     uses: keinou/github-actions/.github/workflows/notification.yaml@main
+    with:
+      webhookUrl: ${{ secrets.discordWebhookUrl }}
