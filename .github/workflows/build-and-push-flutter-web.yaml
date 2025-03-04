@@ -2,6 +2,12 @@ name: Build and push node application
 
 on:
   workflow_call:
+    inputs:
+      flutter-version:
+        description: "Flutter version"
+        type: string
+        required: false
+        default: "3.29.0"
     secrets:
       discordWebhookUrl:
         required: true
@@ -28,7 +34,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.24.2"
+          flutter-version: ${{ inputs.flutter-version }}
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -38,7 +44,7 @@ jobs:
 
       - name: Build Flutter Web
         run: |
-          flutter build web --release --no-tree-shake-icons --web-renderer html
+          flutter build web --release --no-tree-shake-icons --wasm
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
