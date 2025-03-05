@@ -8,6 +8,11 @@ on:
         type: string
         required: false
         default: "3.29.0"
+      flutter-command:
+        description: "Flutter command"
+        type: string
+        required: false
+        default: flutter build web --release --no-tree-shake-icons
     secrets:
       discordWebhookUrl:
         required: true
@@ -44,7 +49,7 @@ jobs:
 
       - name: Build Flutter Web
         run: |
-          flutter build web --release --no-tree-shake-icons --wasm
+          ${inputs.flutter-command}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
