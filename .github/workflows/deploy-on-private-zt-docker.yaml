@@ -1,0 +1,71 @@
+name: Deploy on Private Zero Tier Docker Machine
+
+on:
+  workflow_call:
+    secrets:
+      ZEROTIER_NETWORK_ID:
+        required: true
+      ZEROTIER_API_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install ZeroTier
+        run: |
+          curl -s https://install.zerotier.com | sudo bash
+
+      - name: Join ZeroTier network
+        id: join-network
+        env:
+          ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          ZEROTIER_API_TOKEN: ${{ secrets.ZEROTIER_API_TOKEN }}
+        run: |
+          sudo zerotier-cli join $ZEROTIER_NETWORK_ID
+          # Obter e armazenar o ID do nó para uso posterior
+          ZEROTIER_NODE_ID=$(sudo zerotier-cli info | awk '{print $3}')
+          echo "ZEROTIER_NODE_ID=$ZEROTIER_NODE_ID" >> $GITHUB_ENV
+          echo "zerotier_node_id=$ZEROTIER_NODE_ID" >> $GITHUB_OUTPUT
+          # Aguarde a conexão ser estabelecida
+          sleep 15
+
+      - name: Authorize ZeroTier node
+        env:
+          ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          ZEROTIER_API_TOKEN: ${{ secrets.ZEROTIER_API_TOKEN }}
+        run: |
+          # Autorizar o nó na rede via API
+          curl -X POST "https://api.zerotier.com/api/v1/network/$ZEROTIER_NETWORK_ID/member/$ZEROTIER_NODE_ID" \
+            -H "Authorization: Bearer $ZEROTIER_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"config":{"authorized":true}}'
+
+      - name: Wait for network configuration
+        run: |
+          # Esperar que a configuração de rede seja aplicada
+          sleep 20
+          # Verificar interfaces de rede e rotas
+          ip addr
+          ip route
+
+      - name: Deploy to Docker machine
+        env:
+          DOCKER_HOST: tcp://sv.karc.io:2375
+        run: |
+          docker ps
+
+      - name: Remove ZeroTier node from network
+        if: always()
+        env:
+          ZEROTIER_NETWORK_ID: ${{ secrets.ZEROTIER_NETWORK_ID }}
+          ZEROTIER_API_TOKEN: ${{ secrets.ZEROTIER_API_TOKEN }}
+        run: |
+          # Remover o nó da rede ZeroTier usando a API
+          curl -X DELETE "https://api.zerotier.com/api/v1/network/$ZEROTIER_NETWORK_ID/member/$ZEROTIER_NODE_ID" \
+            -H "Authorization: Bearer $ZEROTIER_API_TOKEN"
+
+          echo "ZeroTier node removido com sucesso da rede"

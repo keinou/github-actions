@@ -23,13 +23,13 @@ env:
 
 jobs:
   build:
-    name: Build
+    name: Build and push
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
       packages: write
-      attestations: write
+      attestations: write 
       id-token: write
 
     steps:
