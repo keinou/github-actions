@@ -7,6 +7,10 @@ on:
         description: "Host IP"
         type: string
         required: true
+      docker-command:
+        description: "Docker command to execute on host"
+        type: string
+        required: true
     secrets:
       ZEROTIER_NETWORK_ID:
         required: true
@@ -60,8 +64,7 @@ jobs:
       - name: Deploy to Docker machine
         env:
           DOCKER_HOST: ${{ inputs.docker-host }}
-        run: |
-          docker ps
+        run: ${{ inputs.docker-command }}
 
       - name: Remove ZeroTier node from network
         if: always()
