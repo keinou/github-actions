@@ -2,6 +2,11 @@ name: Deploy on Private Zero Tier Docker Machine
 
 on:
   workflow_call:
+    inputs:
+      docker-host:
+        description: "Host IP"
+        type: string
+        required: true
     secrets:
       ZEROTIER_NETWORK_ID:
         required: true
@@ -54,7 +59,7 @@ jobs:
 
       - name: Deploy to Docker machine
         env:
-          DOCKER_HOST: tcp://sv.karc.io:2375
+          DOCKER_HOST: ${{ inputs.docker-host }}
         run: |
           docker ps
 
