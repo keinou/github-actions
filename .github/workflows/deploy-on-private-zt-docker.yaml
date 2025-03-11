@@ -3,15 +3,19 @@ name: Deploy on Private Zero Tier Docker Machine
 on:
   workflow_call:
     inputs:
-      docker-host:
-        description: "Host IP"
-        type: string
-        required: true
-      docker-command:
-        description: "Docker command to execute on host"
+      command:
+        description: "Command to execute on host"
         type: string
         required: true
     secrets:
+      HOST:
+        required: true
+      PORT:
+        required: true
+      PASSWORD:
+        required: true
+      USERNAME:
+        required: true
       ZEROTIER_NETWORK_ID:
         required: true
       ZEROTIER_API_TOKEN:
@@ -61,10 +65,14 @@ jobs:
           ip addr
           ip route
 
-      - name: Deploy to Docker machine
-        env:
-          DOCKER_HOST: ${{ inputs.docker-host }}
-        run: ${{ inputs.docker-command }}
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: ${{ inputs.command }}
 
       - name: Remove ZeroTier node from network
         if: always()
