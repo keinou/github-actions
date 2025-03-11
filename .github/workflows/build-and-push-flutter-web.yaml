@@ -13,9 +13,6 @@ on:
         type: string
         required: false
         default: flutter build web --release --no-tree-shake-icons
-    secrets:
-      discordWebhookUrl:
-        required: true
 
 env:
   REGISTRY: ghcr.io
@@ -75,9 +72,3 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  notification:
-    name: Notification
-    needs: ["build"]
-    uses: keinou/github-actions/.github/workflows/notification.yaml@main
-    secrets:
-      webhookUrl: ${{ secrets.discordWebhookUrl }}
