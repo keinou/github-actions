@@ -14,6 +14,6 @@ jobs:
     container: ghcr.io/railwayapp/cli:latest
     env:
       SERVICE: ${{ secrets.SERVICE}}
-      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_TOKEN: ${{ secrets.TOKEN }}
     steps:
       - run: railway redeploy --service=${{ env.SERVICE }} -y
