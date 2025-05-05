@@ -16,4 +16,4 @@ jobs:
       SERVICE: ${{ secrets.SERVICE}}
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
-      - run: railway up --service=${{ env.SERVICE }}
+      - run: railway redeploy --service=${{ env.SERVICE }} -y
