@@ -1,0 +1,19 @@
+name: Redeploy on Railway
+
+on:
+  workflow_call:
+    secrets:
+      TOKEN:
+        required: true
+      SERVICE:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container: ghcr.io/railwayapp/cli:latest
+    env:
+      SERVICE: ${{ secrets.SERVICE}}
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    steps:
+      - run: railway up --service=${{ env.SERVICE }}
